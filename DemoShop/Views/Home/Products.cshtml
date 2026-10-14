@@ -1,0 +1,193 @@
+@model MyShop.Models.ViewModels.ShopFilterViewModel
+@{
+    ViewData["Title"] = "Danh Mục Sản Phẩm Thời Trang Ngọc Hiển";
+}
+
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Sản phẩm</li>
+            @if (Model.CategoryId.HasValue)
+            {
+                var currentCat = Model.Categories.FirstOrDefault(c => c.Id == Model.CategoryId.Value);
+                if (currentCat != null)
+                {
+                    <li class="breadcrumb-item active">@currentCat.Name</li>
+                }
+            }
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Sidebar Bộ lọc -->
+        <div class="col-lg-3 col-md-4 mb-4">
+            <div class="card border-0 shadow-sm rounded-3 p-3">
+                <h5 class="fw-bold mb-3"><i class="bi bi-funnel me-2"></i>Bộ Lọc Sản Phẩm</h5>
+                
+                <form asp-controller="Home" asp-action="Products" method="get">
+                    <!-- Danh mục -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-uppercase text-muted">Danh mục</label>
+                        <div class="list-group list-group-flush">
+                            <a asp-action="Products" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center @(Model.CategoryId == null ? "active" : "")">
+                                Tất cả sản phẩm
+                            </a>
+                            @foreach (var cat in Model.Categories)
+                            {
+                                <a asp-action="Products" asp-route-categoryId="@cat.Id" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center @(Model.CategoryId == cat.Id ? "active" : "")">
+                                    @cat.Name
+                                </a>
+                            }
+                        </div>
+                    </div>
+
+                    @if (Model.CategoryId.HasValue)
+                    {
+                        <input type="hidden" name="categoryId" value="@Model.CategoryId" />
+                    }
+
+                    <!-- Tìm kiếm từ khóa -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-uppercase text-muted">Từ khóa</label>
+                        <input type="text" name="search" value="@Model.Search" class="form-control form-control-sm" placeholder="Sơ mi, áo phao..." />
+                    </div>
+
+                    <!-- Lọc kích thước Size -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-uppercase text-muted">Kích thước (Size)</label>
+                        <select name="size" class="form-select form-select-sm">
+                            <option value="">-- Tất cả kích cỡ --</option>
+                            <option value="M" selected="@(Model.Size == "M")">Size M (50 - 58kg)</option>
+                            <option value="L" selected="@(Model.Size == "L")">Size L (59 - 66kg)</option>
+                            <option value="XL" selected="@(Model.Size == "XL")">Size XL (67 - 75kg)</option>
+                            <option value="2XL" selected="@(Model.Size == "2XL")">Size 2XL (76 - 84kg)</option>
+                            <option value="3XL" selected="@(Model.Size == "3XL")">Size 3XL (85 - 95kg)</option>
+                        </select>
+                    </div>
+
+                    <!-- Lọc theo giá -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-uppercase text-muted">Khoảng giá (VNĐ)</label>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <input type="number" name="minPrice" value="@Model.MinPrice" class="form-control form-control-sm" placeholder="Từ" />
+                            </div>
+                            <div class="col-6">
+                                <input type="number" name="maxPrice" value="@Model.MaxPrice" class="form-control form-control-sm" placeholder="Đến" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sắp xếp -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-uppercase text-muted">Sắp xếp theo</label>
+                        <select name="sort" class="form-select form-select-sm">
+                            <option value="newest" selected="@(Model.Sort == "newest" || Model.Sort == null)">Mới nhất</option>
+                            <option value="price-asc" selected="@(Model.Sort == "price-asc")">Giá tăng dần</option>
+                            <option value="price-desc" selected="@(Model.Sort == "price-desc")">Giá giảm dần</option>
+                            <option value="name-asc" selected="@(Model.Sort == "name-asc")">Tên A-Z</option>
+                        </select>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-dark btn-sm"><i class="bi bi-filter me-1"></i> Áp dụng bộ lọc</button>
+                        <a asp-action="Products" class="btn btn-outline-secondary btn-sm">Đặt lại</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Danh sách sản phẩm -->
+        <div class="col-lg-9 col-md-8">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold mb-0">
+                    @(Model.CategoryId.HasValue ? Model.Categories.FirstOrDefault(c => c.Id == Model.CategoryId.Value)?.Name : "Tất cả sản phẩm")
+                </h4>
+                <span class="text-muted small">Tìm thấy <strong>@Model.TotalItems</strong> sản phẩm</span>
+            </div>
+
+            @if (!Model.Products.Any())
+            {
+                <div class="text-center py-5 bg-light rounded-3">
+                    <i class="bi bi-inbox fs-1 text-muted mb-3 d-block"></i>
+                    <h5>Không tìm thấy sản phẩm phù hợp</h5>
+                    <p class="text-muted small">Vui lòng thử điều chỉnh lại bộ lọc hoặc từ khóa tìm kiếm.</p>
+                    <a asp-action="Products" class="btn btn-outline-dark btn-sm">Xem tất cả sản phẩm</a>
+                </div>
+            }
+            else
+            {
+                <div class="row row-cols-2 row-cols-lg-3 g-3 g-md-4 mb-4">
+                    @foreach (var p in Model.Products)
+                    {
+                        <div class="col">
+                            <div class="product-card">
+                                <div class="product-thumb-wrapper">
+                                    @if (p.DiscountPercent > 0)
+                                    {
+                                        <span class="badge-discount">-@p.DiscountPercent%</span>
+                                    }
+                                    @if (p.IsFeatured)
+                                    {
+                                        <span class="badge-featured">Hot</span>
+                                    }
+                                    <a asp-controller="Home" asp-action="ProductDetail" asp-route-id="@p.Id">
+                                        <img src="@p.ImageUrl" alt="@p.Name" loading="lazy" />
+                                    </a>
+                                </div>
+                                <div class="product-info">
+                                    <span class="product-category">@(p.Category?.Name ?? "Ngọc Hiển")</span>
+                                    <h6 class="product-name">
+                                        <a asp-controller="Home" asp-action="ProductDetail" asp-route-id="@p.Id" class="text-decoration-none text-dark">@p.Name</a>
+                                    </h6>
+                                    <div class="d-flex align-items-baseline mb-3">
+                                        <span class="product-price">@p.Price.ToString("N0") đ</span>
+                                        @if (p.OriginalPrice.HasValue && p.OriginalPrice > p.Price)
+                                        {
+                                            <span class="product-old-price">@p.OriginalPrice.Value.ToString("N0") đ</span>
+                                        }
+                                    </div>
+                                    <div class="mt-auto d-flex gap-2">
+                                        <a asp-controller="Home" asp-action="ProductDetail" asp-route-id="@p.Id" class="btn btn-outline-secondary btn-sm flex-grow-1">Chi tiết</a>
+                                        <form asp-controller="Cart" asp-action="Add" method="post" class="d-inline">
+                                            <input type="hidden" name="productId" value="@p.Id" />
+                                            <input type="hidden" name="quantity" value="1" />
+                                            <input type="hidden" name="size" value="L" />
+                                            <button type="submit" class="btn btn-accent btn-sm" title="Thêm nhanh vào giỏ">
+                                                <i class="bi bi-cart-plus"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Phân trang Pagination -->
+                @if (Model.TotalPages > 1)
+                {
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            @for (int i = 1; i <= Model.TotalPages; i++)
+                            {
+                                <li class="page-item @(Model.CurrentPage == i ? "active" : "")">
+                                    <a class="page-link" asp-action="Products"
+                                       asp-route-page="@i"
+                                       asp-route-categoryId="@Model.CategoryId"
+                                       asp-route-search="@Model.Search"
+                                       asp-route-size="@Model.Size"
+                                       asp-route-minPrice="@Model.MinPrice"
+                                       asp-route-maxPrice="@Model.MaxPrice"
+                                       asp-route-sort="@Model.Sort">@i</a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                }
+            }
+        </div>
+    </div>
+</div>

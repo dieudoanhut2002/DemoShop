@@ -1,0 +1,83 @@
+@{
+    ViewData["Title"] = "Liên Hệ - Hãng Thời Trang Ngọc Hiển";
+}
+
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Liên hệ</li>
+        </ol>
+    </nav>
+
+    <div class="row g-5">
+        <div class="col-lg-5">
+            <h3 class="fw-bold mb-3">LIÊN HỆ VỚI CHÚNG TÔI</h3>
+            <p class="text-muted">Bộ phận Chăm sóc khách hàng của Hãng Thời Trang Ngọc Hiển luôn sẵn sàng phục vụ và giải đáp mọi yêu cầu của quý khách.</p>
+            
+            <div class="d-flex mb-3">
+                <div class="fs-4 text-danger me-3"><i class="bi bi-geo-alt"></i></div>
+                <div>
+                    <h6 class="fw-bold mb-1">Trụ sở chính</h6>
+                    <p class="text-muted small mb-0">168 Phố Huế, Quận Hai Bà Trưng, TP. Hà Nội</p>
+                </div>
+            </div>
+
+            <div class="d-flex mb-3">
+                <div class="fs-4 text-danger me-3"><i class="bi bi-telephone"></i></div>
+                <div>
+                    <h6 class="fw-bold mb-1">Điện thoại / Hotline</h6>
+                    <p class="text-muted small mb-0">0988.889.999 (Hỗ trợ 24/7)</p>
+                </div>
+            </div>
+
+            <div class="d-flex mb-3">
+                <div class="fs-4 text-danger me-3"><i class="bi bi-envelope"></i></div>
+                <div>
+                    <h6 class="fw-bold mb-1">Hòm thư điện tử</h6>
+                    <p class="text-muted small mb-0">contact@ngochien.vn / support@ngochien.vn</p>
+                </div>
+            </div>
+
+            <div class="d-flex">
+                <div class="fs-4 text-danger me-3"><i class="bi bi-clock"></i></div>
+                <div>
+                    <h6 class="fw-bold mb-1">Thời gian phục vụ</h6>
+                    <p class="text-muted small mb-0">Thứ Hai - Chủ Nhật: 08:30 - 22:00</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+                <h4 class="fw-bold mb-3">Gửi Thắc Mắc Hoặc Yêu Cầu</h4>
+                <p class="text-muted small mb-4">Điền thông tin vào form dưới đây, chúng tôi sẽ liên hệ lại với bạn trong vòng 30 phút.</p>
+
+                <form onsubmit="event.preventDefault(); alert('Cảm ơn quý khách đã gửi liên hệ! Tư vấn viên của Thời trang Ngọc Hiển sẽ gọi lại ngay.'); this.reset();">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Họ và tên *</label>
+                            <input type="text" class="form-control" required placeholder="Nguyễn Văn A" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Số điện thoại *</label>
+                            <input type="tel" class="form-control" required placeholder="0988xxxxxx" />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Email</label>
+                            <input type="email" class="form-control" placeholder="email@domain.com" />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Nội dung yêu cầu *</label>
+                            <textarea class="form-control" rows="4" required placeholder="Bạn muốn tư vấn mẫu áo sơ mi, áo rét hoặc phản hồi dịch vụ..."></textarea>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-dark px-4 py-2">Gửi Yêu Cầu Ngay</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

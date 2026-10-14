@@ -1,0 +1,285 @@
+@model MyShop.Models.Product
+@{
+    ViewData["Title"] = Model.Name;
+    var relatedProducts = ViewBag.RelatedProducts as List<Product> ?? new List<Product>();
+    var sizeList = (Model.Sizes ?? "M, L, XL, 2XL, 3XL").Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
+    var colorList = (Model.Colors ?? "Trắng, Đen, Xanh").Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()).ToList();
+}
+
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Products">Sản phẩm</a></li>
+            @if (Model.Category != null)
+            {
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Products" asp-route-categoryId="@Model.CategoryId">@Model.Category.Name</a></li>
+            }
+            <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4 mb-5">
+        <!-- Ảnh sản phẩm -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm p-3 rounded-4">
+                <div class="position-relative overflow-hidden rounded-3 text-center mb-3" style="background-color: #f8fafc;">
+                    @if (Model.DiscountPercent > 0)
+                    {
+                        <span class="badge-discount">-@Model.DiscountPercent%</span>
+                    }
+                    <img id="mainImage" src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded-3" style="max-height: 520px; object-fit: contain;" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Thông tin chi tiết & Đặt mua -->
+        <div class="col-lg-6">
+            <div class="ps-lg-3">
+                <span class="badge bg-secondary mb-2 text-uppercase">@(Model.Category?.Name ?? "Thời Trang Ngọc Hiển")</span>
+                <h2 class="fw-bold mb-2">@Model.Name</h2>
+                
+                <div class="d-flex align-items-center mb-3">
+                    <div class="text-warning me-2">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                    <span class="text-muted small">5.0 (Đã bán: @(Model.StockQuantity > 0 ? 100 - (Model.StockQuantity % 40) : 50)+ chiếc)</span>
+                    <span class="mx-2 text-muted">|</span>
+                    <span class="text-success small fw-bold"><i class="bi bi-check-circle-fill"></i> Còn hàng (@Model.StockQuantity chiếc)</span>
+                </div>
+
+                <!-- Giá bán -->
+                <div class="p-3 bg-light rounded-3 mb-4 d-flex align-items-baseline">
+                    <span class="fs-2 fw-bold text-danger">@Model.Price.ToString("N0") đ</span>
+                    @if (Model.OriginalPrice.HasValue && Model.OriginalPrice > Model.Price)
+                    {
+                        <span class="fs-5 text-muted text-decoration-line-through ms-3">@Model.OriginalPrice.Value.ToString("N0") đ</span>
+                        <span class="badge bg-danger ms-2">Tiết kiệm @((Model.OriginalPrice.Value - Model.Price).ToString("N0")) đ</span>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <strong>Chất liệu:</strong> <span class="badge bg-info text-dark">@Model.Material</span>
+                </div>
+
+                <!-- Form chọn Size & Mua hàng -->
+                <form asp-controller="Cart" asp-action="Add" method="post" id="buyForm">
+                    <input type="hidden" name="productId" value="@Model.Id" />
+
+                    <!-- Kích thước Size -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label fw-bold mb-0">Chọn Size:</label>
+                            <a href="#sizeModal" data-bs-toggle="modal" class="small text-danger text-decoration-none">
+                                <i class="bi bi-rulers me-1"></i> Hướng dẫn chọn size chuẩn
+                            </a>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2">
+                            @for (int i = 0; i < sizeList.Count; i++)
+                            {
+                                var sz = sizeList[i];
+                                <input type="radio" class="btn-check" name="size" id="size_@i" value="@sz" @(i == 0 ? "checked" : "") />
+                                <label class="btn btn-outline-dark px-3 py-2 fw-bold" for="size_@i">@sz</label>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Màu sắc -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold mb-2">Màu sắc:</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            @for (int j = 0; j < colorList.Count; j++)
+                            {
+                                var col = colorList[j];
+                                <input type="radio" class="btn-check" name="color" id="col_@j" value="@col" @(j == 0 ? "checked" : "") />
+                                <label class="btn btn-outline-secondary px-3 py-1 small" for="col_@j">@col</label>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Số lượng -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold mb-2">Số lượng:</label>
+                        <div class="input-group" style="width: 140px;">
+                            <button type="button" class="btn btn-outline-secondary" onclick="decQty()">-</button>
+                            <input type="number" name="quantity" id="quantityInput" class="form-control text-center" value="1" min="1" max="@Model.StockQuantity" />
+                            <button type="button" class="btn btn-outline-secondary" onclick="incQty()">+</button>
+                        </div>
+                    </div>
+
+                    <!-- Nút Mua -->
+                    <div class="d-flex flex-wrap gap-3 mb-4">
+                        <button type="submit" class="btn btn-accent btn-lg px-4 flex-grow-1">
+                            <i class="bi bi-cart-plus me-2"></i> Thêm Vào Giỏ Hàng
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Box Cam kết dịch vụ Ngọc Hiển -->
+                <div class="border rounded-3 p-3 bg-white">
+                    <div class="row g-2 small">
+                        <div class="col-6"><i class="bi bi-shield-check text-success me-1"></i> Cam kết 100% hàng chính hãng</div>
+                        <div class="col-6"><i class="bi bi-truck text-primary me-1"></i> Giao nhanh toàn quốc 2-3 ngày</div>
+                        <div class="col-6"><i class="bi bi-arrow-repeat text-danger me-1"></i> Đổi size miễn phí trong 7 ngày</div>
+                        <div class="col-6"><i class="bi bi-qr-code text-warning me-1"></i> Thanh toán quét VietQR thuận tiện</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thông tin chi tiết sản phẩm Tab -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-5">
+        <ul class="nav nav-tabs border-bottom mb-4" id="productTab" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active fw-bold" id="desc-tab" data-bs-toggle="tab" data-bs-target="#desc" type="button">Mô Tả Sản Phẩm</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-bold" id="material-tab" data-bs-toggle="tab" data-bs-target="#material" type="button">Chất Liệu & Bảo Quản</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-bold" id="policy-tab" data-bs-toggle="tab" data-bs-target="#policy" type="button">Chính Sách Giao Nhận & Đổi Trả</button>
+            </li>
+        </ul>
+        <div class="tab-content" id="productTabContent">
+            <div class="tab-pane fade show active" id="desc">
+                <h5 class="fw-bold mb-3">Đặc điểm nổi bật của @Model.Name</h5>
+                <p class="lead fs-6">@Model.Description</p>
+                <div class="p-3 bg-light rounded-3 my-3">
+                    <h6 class="fw-bold mb-2">Ưu thế may đo của Hãng Thời Trang Ngọc Hiển:</h6>
+                    <ul class="mb-0">
+                        <li>Đường chỉ may kép tỉ mỉ, cổ áo và cổ tay dựng mếch cao cấp định hình sắc nét.</li>
+                        <li>Phom dáng nghiên cứu chuẩn theo thể trạng của người đàn ông Việt Nam.</li>
+                        <li>Họa tiết dệt sợi tinh xảo, cúc khuy bền đẹp không bung vỡ khi giặt máy.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="material">
+                <h5 class="fw-bold mb-3">Chất liệu cao cấp: @Model.Material</h5>
+                <p>Sản phẩm được dệt từ nguyên liệu tuyển chọn khắt khe, thân thiện với làn da, không gây kích ứng.</p>
+                <h6 class="fw-bold mt-3">Hướng dẫn bảo quản:</h6>
+                <ul>
+                    <li>Giặt ở nhiệt độ thường với các sản phẩm cùng màu.</li>
+                    <li>Không sử dụng thuốc tẩy có chứa Clo.</li>
+                    <li>Ủi ở nhiệt độ trung bình dưới 150 độ C.</li>
+                    <li>Phơi nơi thoáng gió râm mát, tránh ánh nắng gắt trực tiếp.</li>
+                </ul>
+            </div>
+            <div class="tab-pane fade" id="policy">
+                <h5 class="fw-bold mb-3">Chính sách ưu đãi khách hàng Ngọc Hiển</h5>
+                <ul>
+                    <li><strong>Miễn phí vận chuyển:</strong> Áp dụng cho mọi đơn hàng từ 500.000 VNĐ.</li>
+                    <li><strong>Kiểm tra hàng trước khi nhận:</strong> Khách hàng được quyền đồng kiểm tra chất vải và kích cỡ trước khi thanh toán.</li>
+                    <li><strong>Đổi hàng trong 7 ngày:</strong> Nếu không vừa size hoặc muốn đổi màu, nhân viên giao nhận sẽ mang sản phẩm mới đến tận nhà đổi cho quý khách.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sản phẩm liên quan -->
+    @if (relatedProducts.Any())
+    {
+        <div class="mb-5">
+            <h4 class="fw-bold mb-4">Sản Phẩm Tương Tự Bạn Có Thể Thích</h4>
+            <div class="row row-cols-2 row-cols-md-4 g-3 g-md-4">
+                @foreach (var rp in relatedProducts)
+                {
+                    <div class="col">
+                        <div class="product-card">
+                            <div class="product-thumb-wrapper">
+                                @if (rp.DiscountPercent > 0)
+                                {
+                                    <span class="badge-discount">-@rp.DiscountPercent%</span>
+                                }
+                                <a asp-controller="Home" asp-action="ProductDetail" asp-route-id="@rp.Id">
+                                    <img src="@rp.ImageUrl" alt="@rp.Name" loading="lazy" />
+                                </a>
+                            </div>
+                            <div class="product-info">
+                                <h6 class="product-name">
+                                    <a asp-controller="Home" asp-action="ProductDetail" asp-route-id="@rp.Id" class="text-decoration-none text-dark">@rp.Name</a>
+                                </h6>
+                                <div class="product-price mb-2">@rp.Price.ToString("N0") đ</div>
+                                <a asp-controller="Home" asp-action="ProductDetail" asp-route-id="@rp.Id" class="btn btn-outline-secondary btn-sm mt-auto w-100">Xem ngay</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Modal Hướng dẫn chọn Size -->
+<div class="modal fade" id="sizeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold"><i class="bi bi-rulers me-2"></i>Bảng Quy Đổi Size Chuẩn Nam Ngọc Hiển</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Size</th>
+                                <th>Chiều cao (cm)</th>
+                                <th>Cân nặng (kg)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="fw-bold text-primary">M</td>
+                                <td>160 - 167</td>
+                                <td>50 - 58</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-primary">L</td>
+                                <td>168 - 173</td>
+                                <td>59 - 66</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-primary">XL</td>
+                                <td>174 - 178</td>
+                                <td>67 - 75</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-primary">2XL</td>
+                                <td>175 - 182</td>
+                                <td>76 - 84</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-primary">3XL</td>
+                                <td>178 - 188</td>
+                                <td>85 - 95</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="small text-muted mb-0"><i class="bi bi-info-circle me-1"></i> Nếu số đo của bạn nằm ở giữa 2 size, hãy ưu tiên chọn size lớn hơn nếu bạn thích mặc thoải mái hoặc mặc áo rét lót nhiều lớp bên trong.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function decQty() {
+            var input = document.getElementById('quantityInput');
+            var val = parseInt(input.value) || 1;
+            if (val > 1) input.value = val - 1;
+        }
+        function incQty() {
+            var input = document.getElementById('quantityInput');
+            var val = parseInt(input.value) || 1;
+            var max = parseInt(input.max) || 100;
+            if (val < max) input.value = val + 1;
+        }
+    </script>
+}

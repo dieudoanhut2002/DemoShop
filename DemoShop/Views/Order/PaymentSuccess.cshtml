@@ -1,0 +1,234 @@
+@model MyShop.Models.Order
+@{
+    ViewData["Title"] = "Đặt Hàng Thành Công - Mã Đơn #" + Model.OrderCode;
+    string? vietQrUrl = ViewBag.VietQrUrl as string;
+    string? fallbackQr = ViewBag.FallbackQrBase64 as string;
+    string bankId = ViewBag.BankId ?? "MB";
+    string bankName = ViewBag.BankName ?? "MB Bank";
+    string accountNo = ViewBag.AccountNo ?? "0987654321";
+    string accountName = ViewBag.AccountName ?? "THOI TRANG NGOC HIEN";
+}
+
+<div class="container py-4">
+    <!-- Thông báo chúc mừng -->
+    <div class="text-center mb-5">
+        <div class="text-success mb-2" style="font-size: 3.5rem;">
+            <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <h2 class="fw-bold">ĐẶT HÀNG THÀNH CÔNG!</h2>
+        <p class="lead text-muted">
+            Cảm ơn quý khách <strong>@Model.CustomerName</strong> đã tin chọn <strong>Hãng Thời Trang Ngọc Hiển</strong>.
+        </p>
+        <div class="badge bg-dark fs-6 px-4 py-2">
+            Mã đơn hàng: <strong class="text-warning">#@Model.OrderCode</strong>
+        </div>
+    </div>
+
+    <!-- KHỐI QUÉT MÃ QR THANH TOÁN (Nếu chọn VietQR) -->
+    @if (Model.PaymentMethod == "VietQR")
+    {
+        <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5 mb-5 qr-pay-card">
+            <div class="text-center mb-4">
+                <span class="badge bg-primary text-uppercase px-3 py-2 mb-2">Thanh Toán Trực Tuyến An Toàn</span>
+                <h3 class="fw-bold text-primary mb-1">
+                    <i class="bi bi-qr-code-scan me-2"></i>QUÉT MÃ QR ĐỂ THANH TOÁN LIÊN NGÂN HÀNG
+                </h3>
+                <p class="text-muted small">
+                    Hỗ trợ tất cả ứng dụng Ngân hàng (MB, VCB, Techcombank, BIDV, ACB, VietinBank...) & Ví điện tử (MoMo, VNPay, ZaloPay, Viettel Money).
+                </p>
+            </div>
+
+            <div class="row align-items-center g-4">
+                <!-- Cột chứa mã QR -->
+                <div class="col-md-5 text-center">
+                    <div class="p-3 bg-white rounded-4 shadow-sm d-inline-block">
+                        <img id="vietQrImage" src="@vietQrUrl" alt="Mã VietQR Thanh Toán" class="qr-code-img mb-2" onerror="this.src='@fallbackQr';" />
+                        <div class="small text-muted mt-2">
+                            <i class="bi bi-camera me-1"></i> Quét mã bằng app ngân hàng bất kỳ
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <a href="@vietQrUrl" download="VietQR_@Model.OrderCode" target="_blank" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-download me-1"></i> Tải mã QR về máy
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Cột thông tin tài khoản chuyển khoản có nút Sao Chép -->
+                <div class="col-md-7">
+                    <h5 class="fw-bold mb-3 text-dark">Thông tin chuyển khoản chính xác:</h5>
+
+                    <!-- Ngân hàng -->
+                    <div class="mb-2">
+                        <span class="small text-muted d-block">Ngân hàng thụ hưởng:</span>
+                        <div class="copy-field">
+                            <span class="fw-bold text-primary">@bankName (@bankId)</span>
+                            <span class="badge bg-light text-dark border">Chuẩn Napas247</span>
+                        </div>
+                    </div>
+
+                    <!-- Số tài khoản -->
+                    <div class="mb-2">
+                        <span class="small text-muted d-block">Số tài khoản:</span>
+                        <div class="copy-field" onclick="copyToClipboard('@accountNo', 'Đã chép số tài khoản!')">
+                            <span class="fw-bold fs-5 text-dark" id="txtAccountNo">@accountNo</span>
+                            <span class="btn btn-sm btn-outline-secondary py-0"><i class="bi bi-clipboard me-1"></i> Sao chép</span>
+                        </div>
+                    </div>
+
+                    <!-- Chủ tài khoản -->
+                    <div class="mb-2">
+                        <span class="small text-muted d-block">Chủ tài khoản:</span>
+                        <div class="copy-field">
+                            <span class="fw-bold text-dark">@accountName</span>
+                            <i class="bi bi-patch-check-fill text-primary"></i>
+                        </div>
+                    </div>
+
+                    <!-- Số tiền -->
+                    <div class="mb-2">
+                        <span class="small text-muted d-block">Số tiền thanh toán:</span>
+                        <div class="copy-field" onclick="copyToClipboard('@((long)Model.TotalAmount)', 'Đã chép số tiền!')">
+                            <span class="fw-bold fs-4 text-danger">@Model.TotalAmount.ToString("N0") đ</span>
+                            <span class="btn btn-sm btn-outline-danger py-0"><i class="bi bi-clipboard me-1"></i> Sao chép</span>
+                        </div>
+                    </div>
+
+                    <!-- Nội dung chuyển khoản -->
+                    <div class="mb-3">
+                        <span class="small text-muted d-block">Nội dung chuyển khoản (bắt buộc):</span>
+                        <div class="copy-field border-primary bg-white" onclick="copyToClipboard('@Model.OrderCode', 'Đã chép mã nội dung!')">
+                            <span class="fw-bold fs-5 text-primary">@Model.OrderCode</span>
+                            <span class="btn btn-sm btn-primary py-0"><i class="bi bi-clipboard me-1"></i> Sao chép</span>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning border-0 small py-2 mb-3">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i> <strong>Lưu ý:</strong> Vui lòng giữ nguyên nội dung chuyển khoản <strong>@Model.OrderCode</strong> để hệ thống tự động ghi nhận thanh toán nhanh chóng.
+                    </div>
+
+                    <button type="button" class="btn btn-success fw-bold py-2 w-100" onclick="notifyPaid()">
+                        <i class="bi bi-check2-all me-1"></i> Tôi Đã Hoàn Tất Chuyển Khoản
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-5 text-center bg-light">
+            <h4 class="fw-bold text-dark"><i class="bi bi-cash-stack text-warning me-2"></i>Thanh toán khi nhận hàng (COD)</h4>
+            <p class="text-muted mb-0">Đơn hàng của bạn sẽ được đóng gói và giao đến tận nhà. Quý khách vui lòng kiểm tra sản phẩm và thanh toán tiền mặt <strong>@Model.TotalAmount.ToString("N0") đ</strong> cho nhân viên chuyển phát.</p>
+        </div>
+    }
+
+    <!-- Chi tiết đơn hàng -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-4">
+        <h5 class="fw-bold mb-4 border-bottom pb-2">Chi Tiết Đơn Hàng #@Model.OrderCode</h5>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <h6 class="fw-bold small text-muted text-uppercase">Thông tin người nhận</h6>
+                <p class="mb-1"><strong>Họ tên:</strong> @Model.CustomerName</p>
+                <p class="mb-1"><strong>Số điện thoại:</strong> @Model.CustomerPhone</p>
+                @if (!string.IsNullOrEmpty(Model.CustomerEmail))
+                {
+                    <p class="mb-1"><strong>Email:</strong> @Model.CustomerEmail</p>
+                }
+                <p class="mb-0"><strong>Địa chỉ giao:</strong> @Model.ShippingAddress, @Model.City</p>
+            </div>
+            <div class="col-md-6">
+                <h6 class="fw-bold small text-muted text-uppercase">Trạng thái & Phương thức</h6>
+                <p class="mb-1"><strong>Phương thức thanh toán:</strong> @(Model.PaymentMethod == "VietQR" ? "Quét mã VietQR (Chuyển khoản)" : "Thanh toán khi nhận hàng (COD)")</p>
+                <p class="mb-1">
+                    <strong>Trạng thái thanh toán:</strong>
+                    @if (Model.PaymentStatus == "Paid")
+                    {
+                        <span class="badge bg-success">Đã thanh toán</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">Chờ thanh toán</span>
+                    }
+                </p>
+                <p class="mb-1">
+                    <strong>Trạng thái đơn hàng:</strong>
+                    <span class="badge bg-info text-dark">Chờ xác nhận</span>
+                </p>
+                <p class="mb-0"><strong>Thời gian đặt:</strong> @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+            </div>
+        </div>
+
+        <div class="table-responsive mb-4">
+            <table class="table align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th class="text-center">Kích thước</th>
+                        <th class="text-center">Đơn giá</th>
+                        <th class="text-center">Số lượng</th>
+                        <th class="text-end">Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.OrderItems)
+                    {
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <img src="@item.ProductImage" alt="@item.ProductName" class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;" />
+                                    <span class="fw-bold">@item.ProductName</span>
+                                </div>
+                            </td>
+                            <td class="text-center"><span class="badge bg-light text-dark border">@item.SelectedSize</span></td>
+                            <td class="text-center">@item.UnitPrice.ToString("N0") đ</td>
+                            <td class="text-center">@item.Quantity</td>
+                            <td class="text-end fw-bold">@item.TotalPrice.ToString("N0") đ</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4" class="text-end text-muted">Tạm tính tiền hàng:</td>
+                        <td class="text-end fw-semibold">@Model.SubTotal.ToString("N0") đ</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="text-end text-muted">Phí giao hàng:</td>
+                        <td class="text-end fw-semibold">
+                            @(Model.ShippingFee == 0 ? "Miễn phí" : Model.ShippingFee.ToString("N0") + " đ")
+                        </td>
+                    </tr>
+                    <tr class="fs-5">
+                        <td colspan="4" class="text-end fw-bold">Tổng thanh toán:</td>
+                        <td class="text-end fw-bold text-danger">@Model.TotalAmount.ToString("N0") đ</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="d-flex flex-wrap gap-3 justify-content-center">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-dark px-4">
+                <i class="bi bi-house me-1"></i> Quay về trang chủ
+            </a>
+            <a asp-controller="Order" asp-action="Tracking" asp-route-orderCode="@Model.OrderCode" class="btn btn-dark px-4">
+                <i class="bi bi-geo-alt me-1"></i> Theo dõi tiến độ đơn hàng
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function copyToClipboard(text, msg) {
+            navigator.clipboard.writeText(text).then(function() {
+                alert(msg || 'Đã sao chép vào bộ nhớ tạm!');
+            }).catch(function() {
+                alert('Không thể tự sao chép, vui lòng bôi đen và nhấn Ctrl+C.');
+            });
+        }
+
+        function notifyPaid() {
+            alert('Cảm ơn quý khách! Hệ thống Thời Trang Ngọc Hiển đã ghi nhận yêu cầu và sẽ kiểm tra đối soát để gửi hàng trong thời gian sớm nhất!');
+        }
+    </script>
+}

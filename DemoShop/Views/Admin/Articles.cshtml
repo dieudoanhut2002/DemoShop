@@ -1,0 +1,72 @@
+@model List<MyShop.Models.Article>
+@{
+    ViewData["Title"] = "Quản Lý Bài Viết & Cẩm Nang - Admin";
+}
+
+<div class="container-fluid px-lg-5 py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1"><i class="bi bi-journal-text text-primary me-2"></i>QUẢN LÝ BÀI VIẾT & CẨM NANG</h3>
+            <p class="text-muted small mb-0">Viết bài xu hướng thời trang, tư vấn chọn áo sơ mi, áo rét và chăm sóc khách hàng</p>
+        </div>
+        <a asp-action="CreateArticle" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> Viết Bài Mới</a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table align-middle table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width: 70px;">Ảnh</th>
+                        <th>Tiêu đề bài viết</th>
+                        <th>Tác giả</th>
+                        <th>Ngày đăng</th>
+                        <th>Lượt đọc</th>
+                        <th>Trạng thái</th>
+                        <th class="text-end" style="width: 140px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">Chưa có bài viết nào.</td>
+                        </tr>
+                    }
+                    @foreach (var a in Model)
+                    {
+                        <tr>
+                            <td>
+                                <img src="@a.ThumbnailUrl" alt="@a.Title" class="rounded" style="width: 60px; height: 45px; object-fit: cover;" />
+                            </td>
+                            <td>
+                                <div class="fw-bold">@a.Title</div>
+                                <small class="text-muted text-truncate d-block" style="max-width: 400px;">@a.Summary</small>
+                            </td>
+                            <td class="small">@a.Author</td>
+                            <td class="small">@a.PublishedAt.ToString("dd/MM/yyyy")</td>
+                            <td><span class="badge bg-light text-dark border">@a.ViewCount</span></td>
+                            <td>
+                                @if (a.IsPublished)
+                                {
+                                    <span class="badge bg-success">Công khai</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Bản nháp</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <a asp-action="EditArticle" asp-route-id="@a.Id" class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></a>
+                                <form asp-action="DeleteArticle" asp-route-id="@a.Id" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa bài viết này?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

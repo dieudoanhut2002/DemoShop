@@ -1,0 +1,236 @@
+================================================================================
+          HƯỚNG DẪN SỬ DỤNG VÀ VẬN HÀNH HỆ THỐNG WEBSITE THƯƠNG MẠI ĐIỆN TỬ
+                         HÃNG THỜI TRANG NGỌC HIỂN
+================================================================================
+
+1. TỔNG QUAN HỆ THỐNG
+--------------------------------------------------------------------------------
+- Tên dự án: Website Bán Hàng Thời Trang Ngọc Hiển
+- Dòng sản phẩm trọng tâm:
+  + Áo Sơ Mi Nam Cao Cấp (vải sợi tre Bamboo kháng khuẩn, vải thông hơi chống nhăn,
+    sơ mi cộc tay, sơ mi dài tay công sở, cúc khuy đen sang trọng).
+  + Áo Rét & Áo Khoác Mùa Đông (áo phao lông vũ siêu nhẹ, áo chần bông 3 lớp,
+    áo khoác cản gió chống nước tuyệt đối, áo bomber lót nỉ ấm áp).
+- Nền tảng kỹ thuật:
+  + Framework: ASP.NET Core 8.0 MVC (C# .NET 8)
+  + Cơ sở dữ liệu: SQL Server / LocalDB (Entity Framework Core Code-First)
+  + Xác thực & Phân quyền: ASP.NET Core Identity (Role: Admin, Customer)
+  + Thanh toán: VietQR Standard (Napas 24/7) sinh mã QR động tự động + Fallback QRCoder
+  + Giao diện: Bootstrap 5.3, Bootstrap Icons, FontAwesome 6, CSS tùy biến sang trọng
+
+- Kho ảnh thực tế đã tích hợp:
+  + 29 hình ảnh áo sơ mi tại: wwwroot/images/products/so-mi/
+  + 21 hình ảnh áo rét mùa đông tại: wwwroot/images/products/ao-ret/
+
+
+2. THÔNG TIN KHỞI CHẠY ỨNG DỤNG
+--------------------------------------------------------------------------------
+- Yêu cầu môi trường:
+  + .NET SDK 8.0 trở lên (máy hiện tại đã cài sẵn .NET SDK)
+  + SQL Server LocalDB (đã cấu hình sẵn kết nối tự động tạo CSDL)
+
+- Các bước chạy dự án:
+  Bước 1: Mở Terminal (PowerShell hoặc Command Prompt)
+  Bước 2: Di chuyển vào thư mục dự án chứa DemoShop.csproj:
+          cd C:\Git\DemoShop\DemoShop\DemoShop
+  Bước 3: Chạy lệnh:
+          dotnet run
+  Bước 4: Mở trình duyệt web và truy cập địa chỉ:
+          http://localhost:5000 (hoặc https://localhost:5001)
+
+- Quá trình tự động khởi tạo dữ liệu (Seeding):
+  Khi ứng dụng chạy lần đầu tiên, hệ thống sẽ tự động:
+  + Tạo database: NgocHienFashionDB trên LocalDB
+  + Tạo toàn bộ các bảng CSDL: Products, Categories, Orders, OrderItems, Articles,...
+  + Nạp dữ liệu mẫu ban đầu: 2 danh mục chính, 19 sản phẩm thực tế kèm ảnh từ kho Images,
+    các bài viết cẩm nang thời trang, các đơn hàng mẫu và tài khoản quản trị.
+
+
+3. TÀI KHOẢN ĐĂNG NHẬP HỆ THỐNG
+--------------------------------------------------------------------------------
+- Tài khoản Quản Trị Viên (Admin):
+  + Đường dẫn đăng nhập: http://localhost:5000/Account/Login
+  + Email:    admin@ngochien.vn
+  + Mật khẩu: Admin@123
+  + Quyền:    Admin (Toàn quyền quản trị Dashboard, Sản phẩm, Danh mục, Đơn hàng, Bài viết)
+
+- Khách hàng:
+  + Có thể đăng ký tài khoản mới trực tiếp tại trang Đăng Ký:
+    http://localhost:5000/Account/Register
+  + Hoặc có thể mua hàng ngay mà không bắt buộc phải có tài khoản.
+
+
+4. HƯỚNG DẪN DÀNH CHO KHÁCH HÀNG (STOREFRONT)
+--------------------------------------------------------------------------------
+4.1. Xem sản phẩm và bộ lọc:
+- Khách hàng xem các bộ sưu tập nổi bật tại Trang chủ (http://localhost:5000).
+- Vào mục "Áo Sơ Mi Nam" hoặc "Áo Rét Mùa Đông" để lọc theo:
+  + Khoảng giá bán (VD: từ 300.000đ đến 800.000đ)
+  + Kích thước (Size: M, L, XL, 2XL, 3XL)
+  + Tìm kiếm theo từ khóa tên hoặc mô tả
+  + Sắp xếp: Giá tăng dần, Giá giảm dần, Mới nhất, Tên A-Z.
+
+4.2. Xem chi tiết & chọn thông số mua:
+- Click vào sản phẩm để xem:
+  + Ảnh phóng to chi tiết chất vải
+  + Chọn Size chuẩn và click xem "Bảng quy đổi size chuẩn"
+  + Chọn Màu sắc và Số lượng cần mua
+  + Đọc mô tả chất liệu sợi tre / bông lông vũ, hướng dẫn giặt ủi
+  + Bấm "Thêm Vào Giỏ Hàng".
+
+4.3. Quản lý giỏ hàng:
+- Click vào biểu tượng giỏ hàng trên thanh điều hướng góc phải.
+- Xem danh sách món hàng, đơn giá, thành tiền.
+- Bấm dấu [+] hoặc [-] để tăng/giảm số lượng món đồ.
+- Theo dõi thanh tiến độ "Miễn phí vận chuyển toàn quốc" cho đơn từ 500.000 VNĐ.
+
+4.4. Thanh toán & Quét mã VietQR:
+- Bấm "Tiến Hành Đặt Hàng" từ giỏ hàng.
+- Nhập họ tên người nhận, số điện thoại, địa chỉ nhận hàng và ghi chú.
+- Chọn phương thức thanh toán:
+  + Lựa chọn 1: "Thanh toán quét mã QR (VietQR / Napas 24/7)" (Khuyên dùng)
+  + Lựa chọn 2: "Thanh toán khi nhận hàng (COD)"
+- Bấm "Xác Nhận Đặt Hàng":
+  + Nếu chọn VietQR: Hệ thống hiển thị ngay mã VietQR chuẩn ngân hàng chứa chính xác
+    số tiền và nội dung chuyển khoản là mã đơn hàng (Ví dụ: NH2610141018).
+  + Khách hàng mở app ngân hàng bất kỳ (MB, Vietcombank, Techcombank, BIDV, MoMo, VNPay...)
+    chọn Quét QR để thanh toán nhanh trong 3 giây.
+  + Có các nút bấm "Sao chép số tài khoản", "Sao chép số tiền", "Sao chép mã nội dung"
+    giúp thao tác tiện lợi trên điện thoại.
+
+4.5. Tra cứu tiến độ đơn hàng:
+- Truy cập menu "Tra cứu đơn hàng" (http://localhost:5000/Order/Tracking).
+- Nhập Mã đơn hàng (VD: NH202601) hoặc Số điện thoại người nhận.
+- Hệ thống hiển thị thanh tiến độ trực quan:
+  Đặt hàng -> Đóng gói -> Vận chuyển -> Hoàn thành.
+
+
+5. HƯỚNG DẪN DÀNH CHO QUẢN TRỊ VIÊN (ADMIN CMS)
+--------------------------------------------------------------------------------
+Sau khi đăng nhập tài khoản Admin (admin@ngochien.vn / Admin@123), menu "Quản trị CMS"
+sẽ xuất hiện trên thanh điều hướng góc phải:
+
+5.1. Bảng điều khiển tổng quan (Dashboard):
+- Đường dẫn: http://localhost:5000/Admin
+- Hiển thị 4 thẻ chỉ số kinh doanh then chốt (KPI):
+  + Tổng doanh thu thực tế đã thanh toán
+  + Tổng số lượng đơn hàng
+  + Số lượng đơn hàng mới đang chờ xử lý
+  + Tổng số lượng sản phẩm & bài viết
+- Danh sách các đơn hàng mới nhất và sản phẩm bán chạy.
+
+5.2. Quản lý sản phẩm (Products):
+- Đường dẫn: http://localhost:5000/Admin/Products
+- Thêm sản phẩm mới (http://localhost:5000/Admin/CreateProduct):
+  + Điền tên sản phẩm, danh mục (Sơ mi hoặc Áo rét)
+  + Giá bán thực tế, giá gốc niêm yết (nếu có khuyến mãi gạch giá)
+  + Nhập chất liệu, số lượng tồn kho, danh sách size và màu sắc
+  + Chọn ảnh có sẵn từ kho ảnh hoặc tải lên ảnh mới từ máy tính
+  + Bật/tắt công tắc "Sản phẩm nổi bật" và "Kích hoạt hiển thị".
+- Chỉnh sửa sản phẩm: Cập nhật giá bán, thông tin, đổi ảnh sản phẩm.
+- Xóa sản phẩm: Xóa an toàn kèm hộp thoại xác nhận.
+
+5.3. Quản lý danh mục (Categories):
+- Đường dẫn: http://localhost:5000/Admin/Categories
+- Thêm mới danh mục, đặt thứ tự hiển thị ưu tiên trên menu.
+- Chỉnh sửa tên, slug hoặc ẩn/hiện danh mục.
+- Kiểm tra tính toàn vẹn: Không cho phép xóa danh mục khi đang có sản phẩm thuộc về nó.
+
+5.4. Quản lý đơn hàng (Orders):
+- Đường dẫn: http://localhost:5000/Admin/Orders
+- Lọc đơn hàng nhanh theo trạng thái: Tất cả / Chờ xác nhận / Đang xử lý / Đang giao / Đã giao / Đã hủy.
+- Bấm "Xử lý" tại từng đơn hàng để:
+  + Xem chi tiết sản phẩm khách đặt (tên, ảnh, size, số lượng, giá tiền).
+  + Xem thông tin liên hệ và địa chỉ giao hàng của khách.
+  + Cập nhật trạng thái đơn hàng (Pending -> Processing -> Shipping -> Delivered -> Cancelled).
+  + Cập nhật trạng thái thanh toán (Pending -> Paid -> Refunded).
+  + Bấm nút "In phiếu giao hàng" để in ra giấy hoặc lưu file PDF gửi cho shipper.
+
+5.5. Quản lý bài viết cẩm nang & tin tức (Articles):
+- Đường dẫn: http://localhost:5000/Admin/Articles
+- Viết bài mới (http://localhost:5000/Admin/CreateArticle):
+  + Nhập tiêu đề bài viết, tác giả, tóm tắt ngắn.
+  + Chọn ảnh bìa hoặc tải lên ảnh bìa mới.
+  + Nhập nội dung bài viết phong phú (hỗ trợ định dạng HTML, hình ảnh).
+  + Bật/tắt trạng thái xuất bản (Công khai hoặc Bản nháp).
+- Sửa/Xóa bài viết nhanh chóng.
+
+
+6. CẤU HÌNH TÀI KHOẢN NGÂN HÀNG NHẬN THANH TOÁN VIETQR
+--------------------------------------------------------------------------------
+Thông tin tài khoản nhận tiền chuyển khoản quét mã VietQR được cấu hình tập trung
+trong file: DemoShop/appsettings.json
+
+"PaymentSettings": {
+  "BankId": "MB",
+  "AccountNo": "0987654321",
+  "AccountName": "THOI TRANG NGOC HIEN",
+  "BankName": "Ngân hàng TMCP Quân Đội (MBBank)"
+}
+
+Để đổi sang ngân hàng khác (ví dụ: Vietcombank, Techcombank, BIDV, VPBank, ACB...):
+- BankId: Mã định danh ngân hàng chuẩn VietQR (VCB, TCB, BIDV, VPB, ACB, MB,...)
+- AccountNo: Số tài khoản ngân hàng của bạn
+- AccountName: Tên chủ tài khoản viết hoa không dấu (Ví dụ: NGUYEN VAN A)
+- BankName: Tên hiển thị đầy đủ của ngân hàng
+Khi thay đổi, toàn bộ mã QR sinh ra cho các đơn hàng sau đó sẽ tự động trỏ về tài khoản mới.
+
+
+7. CẤU TRÚC THƯ MỤC DỰ ÁN
+--------------------------------------------------------------------------------
+DemoShop/
+├── DemoShop.sln                    # File giải pháp Visual Studio / .NET
+├── REQUIREMENTS.md                 # Tài liệu đặc tả yêu cầu & checklist nghiệm thu
+├── HUONGDAN.txt                    # Toàn bộ hướng dẫn sử dụng và vận hành này
+├── Images/                         # Thư mục gốc chứa ảnh gốc (So mi, Ao rét)
+└── DemoShop/                       # Dự án web ASP.NET Core chính
+    ├── Controllers/
+    │   ├── HomeController.cs       # Xử lý trang chủ, danh mục sản phẩm, bài viết, giới thiệu
+    │   ├── CartController.cs       # Xử lý giỏ hàng, cập nhật số lượng, tính phí ship
+    │   ├── OrderController.cs      # Xử lý đặt hàng, thanh toán VietQR, tra cứu đơn
+    │   ├── AdminController.cs      # Quản trị CMS Dashboard, Sản phẩm, Danh mục, Đơn, Bài viết
+    │   └── AccountController.cs    # Đăng nhập, đăng ký, đăng xuất người dùng
+    ├── Models/
+    │   ├── Product.cs              # Thực thể sản phẩm (giá, size, màu, chất liệu, ảnh, tồn kho)
+    │   ├── Category.cs             # Thực thể danh mục sản phẩm
+    │   ├── Order.cs                # Thực thể đơn hàng (thông tin người nhận, tiền, trạng thái)
+    │   ├── OrderItem.cs            # Thực thể chi tiết món hàng trong đơn
+    │   ├── Article.cs              # Thực thể bài viết cẩm nang thời trang
+    │   └── ViewModels/             # Các model trung gian cho View (Checkout, Dashboard,...)
+    ├── Data/
+    │   ├── ApplicationDbContext.cs # DbContext Entity Framework Core kết nối SQL Server
+    │   └── DbInitializer.cs        # Nạp dữ liệu mẫu ban đầu từ kho ảnh và tài khoản Admin
+    ├── Services/
+    │   ├── IVietQrService.cs       # Interface tạo mã thanh toán VietQR
+    │   └── VietQrService.cs        # Triển khai tạo URL VietQR và mã QR offline QRCoder
+    ├── Views/
+    │   ├── Home/                   # Giao diện Trang chủ, Sản phẩm, Chi tiết, Bài viết, Giới thiệu
+    │   ├── Cart/                   # Giao diện xem và quản lý giỏ hàng
+    │   ├── Order/                  # Giao diện Thanh toán Checkout, Quét VietQR, Tra cứu đơn
+    │   ├── Admin/                  # Giao diện Dashboard, Quản lý sản phẩm, đơn hàng, bài viết
+    │   ├── Account/                # Giao diện Đăng nhập, Đăng ký
+    │   └── Shared/                 # Layout chính sang trọng chuẩn thương hiệu Ngọc Hiển
+    ├── wwwroot/
+    │   ├── css/site.css            # File style thiết kế cao cấp cho thương hiệu Ngọc Hiển
+    │   └── images/
+    │       ├── products/so-mi/     # 29 ảnh áo sơ mi đã chuẩn hóa từ thư mục Images
+    │       ├── products/ao-ret/    # 21 ảnh áo rét đã chuẩn hóa từ thư mục Images
+    │       └── uploads/            # Thư mục lưu ảnh khi Admin tải lên từ trình duyệt
+    ├── appsettings.json            # Cấu hình chuỗi kết nối CSDL và thông tin VietQR
+    └── Program.cs                  # Cấu hình dịch vụ, pipeline, phân quyền và seeding
+
+
+8. CHECKLIST KIỂM TRA & BẢO TRÌ
+--------------------------------------------------------------------------------
+[x] Build ứng dụng thành công: 0 Error(s), 0 Warning(s)
+[x] Khởi tạo CSDL LocalDB và nạp dữ liệu mẫu thành công
+[x] Đăng nhập Admin thành công với quyền quản trị viên
+[x] Hiển thị và lọc sản phẩm theo danh mục Sơ mi & Áo rét mượt mà
+[x] Thêm sản phẩm vào giỏ hàng, cập nhật số lượng và tính tiền chuẩn xác
+[x] Đặt hàng và sinh mã quét VietQR chuẩn liên ngân hàng Napas 24/7
+[x] Tra cứu trạng thái đơn hàng theo mã đơn hoặc số điện thoại
+[x] Dashboard quản trị thống kê doanh thu, đơn hàng, cập nhật trạng thái đơn
+
+================================================================================
+Chúc quý khách và Hãng Thời Trang Ngọc Hiển kinh doanh hồng phát và thành công!
+================================================================================

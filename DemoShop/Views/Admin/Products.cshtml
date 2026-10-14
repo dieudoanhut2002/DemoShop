@@ -1,0 +1,106 @@
+@model List<MyShop.Models.Product>
+@{
+    ViewData["Title"] = "Quản Lý Sản Phẩm - Admin Ngọc Hiển";
+}
+
+<div class="container-fluid px-lg-5 py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1"><i class="bi bi-box-seam text-primary me-2"></i>QUẢN LÝ SẢN PHẨM</h3>
+            <p class="text-muted small mb-0">Tổng cộng: <strong>@Model.Count</strong> sản phẩm áo sơ mi & áo rét trong hệ thống</p>
+        </div>
+        <a asp-action="CreateProduct" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> Thêm Sản Phẩm Mới</a>
+    </div>
+
+    <!-- Thanh tìm kiếm & lọc danh mục -->
+    <div class="card border-0 shadow-sm rounded-4 p-3 mb-4">
+        <form asp-action="Products" method="get" class="row g-2 align-items-center">
+            <div class="col-md-5">
+                <input type="text" name="search" class="form-control form-control-sm" placeholder="Tìm theo tên sản phẩm..." value="@Context.Request.Query["search"]" />
+            </div>
+            <div class="col-md-4">
+                <select name="categoryId" class="form-select form-select-sm" asp-items="ViewBag.Categories">
+                    <option value="">-- Tất cả danh mục --</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-dark btn-sm flex-grow-1"><i class="bi bi-search me-1"></i> Tìm kiếm</button>
+                <a asp-action="Products" class="btn btn-outline-secondary btn-sm">Đặt lại</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Bảng danh sách sản phẩm -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table align-middle table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width: 70px;">Ảnh</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Danh mục</th>
+                        <th>Giá bán</th>
+                        <th>Giá niêm yết</th>
+                        <th>Tồn kho</th>
+                        <th>Nổi bật</th>
+                        <th>Trạng thái</th>
+                        <th class="text-end" style="width: 140px;">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model)
+                    {
+                        <tr>
+                            <td>
+                                <img src="@p.ImageUrl" alt="@p.Name" class="rounded" style="width: 55px; height: 55px; object-fit: cover;" />
+                            </td>
+                            <td>
+                                <div class="fw-bold">@p.Name</div>
+                                <small class="text-muted">Chất liệu: @p.Material</small>
+                            </td>
+                            <td><span class="badge bg-light text-dark border">@(p.Category?.Name ?? "Chưa phân loại")</span></td>
+                            <td class="fw-bold text-danger">@p.Price.ToString("N0") đ</td>
+                            <td class="text-muted">@(p.OriginalPrice.HasValue ? p.OriginalPrice.Value.ToString("N0") + " đ" : "-")</td>
+                            <td>
+                                <span class="badge @(p.StockQuantity > 10 ? "bg-success" : "bg-warning text-dark")">
+                                    @p.StockQuantity chiếc
+                                </span>
+                            </td>
+                            <td>
+                                @if (p.IsFeatured)
+                                {
+                                    <span class="badge bg-warning text-dark"><i class="bi bi-star-fill"></i> Có</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">Không</span>
+                                }
+                            </td>
+                            <td>
+                                @if (p.IsActive)
+                                {
+                                    <span class="badge bg-success">Đang bán</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Tạm ẩn</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <a asp-action="EditProduct" asp-route-id="@p.Id" class="btn btn-sm btn-outline-primary me-1" title="Sửa">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form asp-action="DeleteProduct" asp-route-id="@p.Id" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

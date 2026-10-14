@@ -1,0 +1,150 @@
+@model MyShop.Models.ViewModels.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Quản Trị CMS - Tổng Quan Doanh Nghiệp";
+}
+
+<div class="container-fluid px-lg-5 py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1"><i class="bi bi-speedometer2 text-primary me-2"></i>BẢNG ĐIỀU KHIỂN QUẢN TRỊ (ADMIN DASHBOARD)</h3>
+            <p class="text-muted small mb-0">Hệ thống thương mại điện tử Hãng Thời Trang Ngọc Hiển</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="CreateProduct" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle me-1"></i> Thêm sản phẩm</a>
+            <a asp-action="CreateArticle" class="btn btn-outline-dark btn-sm"><i class="bi bi-pencil-square me-1"></i> Viết bài mới</a>
+        </div>
+    </div>
+
+    <!-- 4 KPI Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-3">
+            <div class="kpi-card kpi-blue d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="small text-uppercase opacity-75">Doanh Thu Đã Thu</span>
+                    <h3 class="fw-bold my-1">@Model.TotalRevenue.ToString("N0") đ</h3>
+                    <span class="small opacity-75"><i class="bi bi-check-circle me-1"></i>Đơn đã thanh toán</span>
+                </div>
+                <div class="fs-1 opacity-50"><i class="bi bi-currency-dollar"></i></div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="kpi-card kpi-green d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="small text-uppercase opacity-75">Tổng Đơn Hàng</span>
+                    <h3 class="fw-bold my-1">@Model.TotalOrders</h3>
+                    <span class="small opacity-75"><i class="bi bi-cart me-1"></i>Từ khi ra mắt</span>
+                </div>
+                <div class="fs-1 opacity-50"><i class="bi bi-receipt"></i></div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="kpi-card kpi-orange d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="small text-uppercase opacity-75">Đơn Chờ Xử Lý</span>
+                    <h3 class="fw-bold my-1">@Model.PendingOrders</h3>
+                    <span class="small opacity-75"><i class="bi bi-clock-history me-1"></i>Cần xử lý ngay</span>
+                </div>
+                <div class="fs-1 opacity-50"><i class="bi bi-hourglass-split"></i></div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="kpi-card kpi-purple d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="small text-uppercase opacity-75">Sản Phẩm & Bài Viết</span>
+                    <h3 class="fw-bold my-1">@Model.TotalProducts / @Model.TotalArticles</h3>
+                    <span class="small opacity-75"><i class="bi bi-box-seam me-1"></i>Sơ mi, áo rét & blog</span>
+                </div>
+                <div class="fs-1 opacity-50"><i class="bi bi-tags"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hàng 2: Đơn hàng mới nhất & Sản phẩm -->
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-clock-history text-primary me-2"></i>Đơn Hàng Mới Nhất</h5>
+                    <a asp-action="Orders" class="btn btn-outline-primary btn-sm">Xem tất cả đơn hàng</a>
+                </div>
+
+                @if (!Model.RecentOrders.Any())
+                {
+                    <p class="text-muted text-center py-4">Chưa có đơn hàng nào.</p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table align-middle table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Mã đơn</th>
+                                    <th>Khách hàng</th>
+                                    <th>Tổng tiền</th>
+                                    <th>Phương thức</th>
+                                    <th>Trạng thái đơn</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var ord in Model.RecentOrders)
+                                {
+                                    <tr>
+                                        <td><strong class="text-primary">#@ord.OrderCode</strong></td>
+                                        <td>
+                                            <div class="fw-bold">@ord.CustomerName</div>
+                                            <small class="text-muted">@ord.CustomerPhone</small>
+                                        </td>
+                                        <td class="fw-bold text-danger">@ord.TotalAmount.ToString("N0") đ</td>
+                                        <td>
+                                            <span class="badge @(ord.PaymentMethod == "VietQR" ? "bg-info text-dark" : "bg-light text-dark border")">
+                                                @ord.PaymentMethod
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge @(ord.OrderStatus == "Delivered" ? "bg-success" : (ord.OrderStatus == "Cancelled" ? "bg-danger" : "bg-warning text-dark"))">
+                                                @ord.OrderStatus
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a asp-action="OrderDetail" asp-route-id="@ord.Id" class="btn btn-sm btn-outline-secondary">
+                                                <i class="bi bi-eye"></i> Chi tiết
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-fire text-danger me-2"></i>Sản Phẩm Tiêu Biểu</h5>
+                    <a asp-action="Products" class="btn btn-outline-secondary btn-sm">Quản lý kho</a>
+                </div>
+
+                @foreach (var prod in Model.TopProducts)
+                {
+                    <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
+                        <img src="@prod.ImageUrl" alt="@prod.Name" class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;" />
+                        <div class="flex-grow-1">
+                            <div class="small fw-bold text-dark text-truncate" style="max-width: 170px;">@prod.Name</div>
+                            <small class="text-muted">@(prod.Category?.Name ?? "Ngọc Hiển")</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="small fw-bold text-danger">@prod.Price.ToString("N0") đ</div>
+                            <small class="text-success">Kho: @prod.StockQuantity</small>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

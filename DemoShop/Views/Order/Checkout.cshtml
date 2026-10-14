@@ -1,0 +1,175 @@
+@model MyShop.Models.ViewModels.CheckoutViewModel
+@{
+    ViewData["Title"] = "Thanh Toán Đặt Hàng - Hãng Thời Trang Ngọc Hiển";
+    var cart = ViewBag.Cart as List<CartItem> ?? new List<CartItem>();
+    decimal subTotal = ViewBag.SubTotal ?? 0;
+    decimal shippingFee = ViewBag.ShippingFee ?? 0;
+    decimal totalAmount = ViewBag.TotalAmount ?? 0;
+}
+
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Cart" asp-action="Index">Giỏ hàng</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Thanh toán & Đặt hàng</li>
+        </ol>
+    </nav>
+
+    <h3 class="fw-bold mb-4">THÔNG TIN GIAO HÀNG & THANH TOÁN</h3>
+
+    <form asp-action="Checkout" method="post">
+        @Html.AntiForgeryToken()
+        <div class="row g-4">
+            <!-- Cột trái: Thông tin nhận hàng & Phương thức thanh toán -->
+            <div class="col-lg-7">
+                <!-- Thông tin khách hàng -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                    <h5 class="fw-bold mb-3 border-bottom pb-2">
+                        <i class="bi bi-geo-alt-fill text-danger me-2"></i>1. Địa Chỉ Nhận Hàng
+                    </h5>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="CustomerName" class="form-label small fw-bold">Họ và tên người nhận *</label>
+                            <input asp-for="CustomerName" class="form-control" placeholder="Ví dụ: Nguyễn Văn Hùng" />
+                            <span asp-validation-for="CustomerName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="CustomerPhone" class="form-label small fw-bold">Số điện thoại *</label>
+                            <input asp-for="CustomerPhone" class="form-control" placeholder="0988xxxxxx" />
+                            <span asp-validation-for="CustomerPhone" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="CustomerEmail" class="form-label small fw-bold">Email nhận hóa đơn điện tử</label>
+                            <input asp-for="CustomerEmail" class="form-control" placeholder="email@domain.com (tùy chọn)" />
+                            <span asp-validation-for="CustomerEmail" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="City" class="form-label small fw-bold">Tỉnh / Thành phố *</label>
+                            <select asp-for="City" class="form-select">
+                                <option value="Hà Nội">Hà Nội</option>
+                                <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
+                                <option value="Hải Phòng">Hải Phòng</option>
+                                <option value="Đà Nẵng">Đà Nẵng</option>
+                                <option value="Quảng Ninh">Quảng Ninh</option>
+                                <option value="Cần Thơ">Cần Thơ</option>
+                                <option value="Bắc Ninh">Bắc Ninh</option>
+                                <option value="Nghệ An">Nghệ An</option>
+                                <option value="Khác">Các tỉnh thành khác...</option>
+                            </select>
+                            <span asp-validation-for="City" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ShippingAddress" class="form-label small fw-bold">Số nhà, ngõ ngách, tên đường *</label>
+                            <input asp-for="ShippingAddress" class="form-control" placeholder="Số 168 Phố Huế..." />
+                            <span asp-validation-for="ShippingAddress" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Notes" class="form-label small fw-bold">Ghi chú giao hàng</label>
+                            <textarea asp-for="Notes" class="form-control" rows="2" placeholder="Ví dụ: Giao giờ hành chính, gọi trước khi đến..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phương thức thanh toán -->
+                <div class="card border-0 shadow-sm rounded-4 p-4">
+                    <h5 class="fw-bold mb-3 border-bottom pb-2">
+                        <i class="bi bi-credit-card-2-front-fill text-primary me-2"></i>2. Phương Thức Thanh Toán
+                    </h5>
+
+                    <!-- Option 1: VietQR -->
+                    <div class="form-check p-3 border rounded-3 mb-3 bg-light">
+                        <input class="form-check-input ms-0 me-3" type="radio" asp-for="PaymentMethod" id="payVietQR" value="VietQR" checked>
+                        <label class="form-check-label w-100" for="payVietQR">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong class="text-primary fs-6"><i class="bi bi-qr-code me-1"></i> Thanh toán quét mã QR (VietQR / Napas 247)</strong>
+                                    <span class="badge bg-success ms-2">Khuyên Dùng</span>
+                                </div>
+                                <div>
+                                    <span class="badge bg-white text-dark border">MoMo</span>
+                                    <span class="badge bg-white text-dark border">VNPay</span>
+                                    <span class="badge bg-white text-dark border">MBBank</span>
+                                </div>
+                            </div>
+                            <p class="small text-muted mb-0 mt-1">
+                                Tự động sinh mã VietQR chuẩn ngân hàng với số tiền và nội dung đơn hàng chính xác. Mở bất kỳ app ngân hàng hoặc ví điện tử để quét thanh toán trong 3 giây.
+                            </p>
+                        </label>
+                    </div>
+
+                    <!-- Option 2: COD -->
+                    <div class="form-check p-3 border rounded-3">
+                        <input class="form-check-input ms-0 me-3" type="radio" asp-for="PaymentMethod" id="payCOD" value="COD">
+                        <label class="form-check-label w-100" for="payCOD">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong><i class="bi bi-cash-stack text-warning me-1"></i> Thanh toán khi nhận hàng (COD)</strong>
+                                <span class="badge bg-light text-dark border">Tiền mặt</span>
+                            </div>
+                            <p class="small text-muted mb-0 mt-1">
+                                Khách hàng được quyền kiểm tra hàng trước, ưng ý mới thanh toán tiền mặt cho nhân viên giao hàng.
+                            </p>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cột phải: Đơn hàng tóm tắt -->
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 90px;">
+                    <h5 class="fw-bold mb-3 border-bottom pb-2">Đơn Hàng Của Bạn (@cart.Sum(i => i.Quantity) sản phẩm)</h5>
+
+                    <div class="cart-items-preview mb-3" style="max-height: 280px; overflow-y: auto;">
+                        @foreach (var item in cart)
+                        {
+                            <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
+                                <img src="@item.ProductImage" alt="@item.ProductName" class="rounded me-3" style="width: 55px; height: 55px; object-fit: cover;" />
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0 small fw-bold">@item.ProductName</h6>
+                                    <span class="small text-muted">Size: @item.SelectedSize | Số lượng: @item.Quantity</span>
+                                </div>
+                                <div class="fw-bold small text-danger text-end">
+                                    @item.TotalPrice.ToString("N0") đ
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Tiền hàng:</span>
+                        <span class="fw-semibold">@subTotal.ToString("N0") đ</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Phí vận chuyển:</span>
+                        @if (shippingFee == 0)
+                        {
+                            <span class="text-success fw-bold small">MIỄN PHÍ</span>
+                        }
+                        else
+                        {
+                            <span class="fw-semibold small">@shippingFee.ToString("N0") đ</span>
+                        }
+                    </div>
+
+                    <hr class="my-3">
+
+                    <div class="d-flex justify-content-between align-items-baseline mb-4">
+                        <span class="fw-bold fs-5">Tổng thanh toán:</span>
+                        <span class="fs-4 fw-bold text-danger">@totalAmount.ToString("N0") đ</span>
+                    </div>
+
+                    <button type="submit" class="btn btn-accent btn-lg py-3 fw-bold w-100 shadow-sm">
+                        <i class="bi bi-shield-lock-fill me-2"></i> Xác Nhận Đặt Hàng
+                    </button>
+
+                    <div class="mt-3 text-center small text-muted">
+                        Bằng việc bấm đặt hàng, quý khách đồng ý với các <a href="#" class="text-decoration-none">Chính sách & Quy định</a> của Thời Trang Ngọc Hiển.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

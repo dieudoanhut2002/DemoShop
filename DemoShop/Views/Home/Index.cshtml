@@ -1,0 +1,299 @@
+@model dynamic
+@{
+    ViewData["Title"] = "Trang Chủ - Thời Trang Nam Công Sở & Mùa Đông";
+    var categories = ViewBag.Categories as List<Category> ?? new List<Category>();
+    var featuredProducts = ViewBag.FeaturedProducts as List<Product> ?? new List<Product>();
+    var shirtProducts = ViewBag.ShirtProducts as List<Product> ?? new List<Product>();
+    var winterProducts = ViewBag.WinterProducts as List<Product> ?? new List<Product>();
+    var latestArticles = ViewBag.LatestArticles as List<Article> ?? new List<Article>();
+}
+
+<!-- Hero Banner Section -->
+<section class="container mt-3">
+    <div class="hero-banner p-4 p-md-5">
+        <div class="col-lg-7 col-md-9">
+            <span class="badge bg-warning text-dark px-3 py-2 text-uppercase mb-3 fw-bold">Bộ Sưu Tập Mới 2026</span>
+            <h1 class="hero-title mb-3">ĐẲNG CẤP QUÝ ÔNG NGỌC HIỂN</h1>
+            <p class="lead mb-4 text-light">
+                Tinh tế trong từng đường may đo. Trải nghiệm chất liệu vải sợi tre tự nhiên thoáng khí cho ngày hè năng động và áo phao lông vũ siêu nhẹ, áo chần bông ấm áp cho mùa đông giá lạnh.
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+                <a asp-controller="Home" asp-action="Products" asp-route-categoryId="1" class="btn btn-accent btn-lg px-4 py-2">
+                    <i class="bi bi-bag-check me-2"></i> Khám Phá Sơ Mi
+                </a>
+                <a asp-controller="Home" asp-action="Products" asp-route-categoryId="2" class="btn btn-outline-light btn-lg px-4 py-2">
+                    <i class="bi bi-snow me-2"></i> Áo Rét Mùa Đông
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Cam kết thương hiệu -->
+<section class="container mb-5">
+    <div class="row g-3">
+        <div class="col-md-3 col-sm-6">
+            <div class="feature-box text-center h-100">
+                <div class="feature-icon"><i class="bi bi-patch-check"></i></div>
+                <h6 class="fw-bold mb-1">Chất Liệu Tuyển Chọn</h6>
+                <p class="small text-muted mb-0">100% sợi tre tự nhiên, cotton cao cấp và lông vũ chống rét.</p>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="feature-box text-center h-100">
+                <div class="feature-icon"><i class="bi bi-truck"></i></div>
+                <h6 class="fw-bold mb-1">Giao Hàng Toàn Quốc</h6>
+                <p class="small text-muted mb-0">Miễn phí vận chuyển cho đơn hàng từ 500.000 VNĐ.</p>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="feature-box text-center h-100">
+                <div class="feature-icon"><i class="bi bi-qr-code-scan"></i></div>
+                <h6 class="fw-bold mb-1">Thanh Toán VietQR</h6>
+                <p class="small text-muted mb-0">Quét mã QR tự động chính xác, bảo mật qua tất cả ngân hàng.</p>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="feature-box text-center h-100">
+                <div class="feature-icon"><i class="bi bi-arrow-repeat"></i></div>
+                <h6 class="fw-bold mb-1">Đổi Trả Dễ Dàng</h6>
+                <p class="small text-muted mb-0">Hỗ trợ đổi size và đổi mẫu tận nơi trong vòng 7 ngày.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Bộ sưu tập Danh mục nổi bật -->
+<section class="container mb-5">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <span class="text-uppercase text-danger fw-bold small">Dòng Sản Phẩm Trọng Tâm</span>
+            <h3 class="fw-bold mb-0">DANH MỤC THỜI TRANG NGỌC HIỂN</h3>
+        </div>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm overflow-hidden position-relative rounded-4 text-white">
+                <img src="/images/products/so-mi/somi_25.jpg" class="card-img" style="height: 280px; object-fit: cover; filter: brightness(0.65);" alt="Áo Sơ Mi Nam">
+                <div class="card-img-overlay d-flex flex-column justify-content-end p-4">
+                    <span class="badge bg-danger mb-2 w-auto align-self-start">Best Seller</span>
+                    <h4 class="card-title fw-bold">ÁO SƠ MI NAM CÔNG SỞ</h4>
+                    <p class="card-text small text-light">Sơ mi cộc tay thông hơi, dài tay kẻ sợi tre kháng khuẩn, form dáng chuẩn mực.</p>
+                    <a asp-controller="Home" asp-action="Products" asp-route-categoryId="1" class="btn btn-light btn-sm fw-bold align-self-start px-3">Xem 29+ Mẫu Sơ Mi</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm overflow-hidden position-relative rounded-4 text-white">
+                <img src="/images/products/ao-ret/aoret_01.jpg" class="card-img" style="height: 280px; object-fit: cover; filter: brightness(0.65);" alt="Áo Rét Mùa Đông">
+                <div class="card-img-overlay d-flex flex-column justify-content-end p-4">
+                    <span class="badge bg-warning text-dark mb-2 w-auto align-self-start">Mùa Đông Ấm Áp</span>
+                    <h4 class="card-title fw-bold">ÁO RÉT & ÁO KHOÁC ĐẠI HÀN</h4>
+                    <p class="card-text small text-light">Áo phao lông vũ siêu nhẹ, áo chần bông 3 lớp, chống gió và cản nước tuyệt đối.</p>
+                    <a asp-controller="Home" asp-action="Products" asp-route-categoryId="2" class="btn btn-light btn-sm fw-bold align-self-start px-3">Xem 21+ Mẫu Áo Rét</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sản phẩm Nổi Bật (Featured) -->
+@if (featuredProducts.Any())
+{
+    <section class="container mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <span class="text-uppercase text-danger fw-bold small">Được Khách Hàng Yêu Thích</span>
+                <h3 class="fw-bold mb-0">SẢN PHẨM NỔI BẬT</h3>
+            </div>
+            <a asp-controller="Home" asp-action="Products" class="btn btn-outline-dark btn-sm">Xem tất cả <i class="bi bi-arrow-right ms-1"></i></a>
+        </div>
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4">
+            @foreach (var p in featuredProducts)
+            {
+                <div class="col">
+                    <div class="product-card">
+                        <div class="product-thumb-wrapper">
+                            @if (p.DiscountPercent > 0)
+                            {
+                                <span class="badge-discount">-@p.DiscountPercent%</span>
+                            }
+                            <span class="badge-featured">Hot</span>
+                            <a asp-controller="Home" asp-action="ProductDetail" asp-route-id="@p.Id">
+                                <img src="@p.ImageUrl" alt="@p.Name" loading="lazy" />
+                            </a>
+                        </div>
+                        <div class="product-info">
+                            <span class="product-category">@(p.Category?.Name ?? "Ngọc Hiển")</span>
+                            <h6 class="product-name">
+                                <a asp-controller="Home" asp-action="ProductDetail" asp-route-id="@p.Id" class="text-decoration-none text-dark">@p.Name</a>
+                            </h6>
+                            <div class="d-flex align-items-baseline mb-3">
+                                <span class="product-price">@p.Price.ToString("N0") đ</span>
+                                @if (p.OriginalPrice.HasValue && p.OriginalPrice > p.Price)
+                                {
+                                    <span class="product-old-price">@p.OriginalPrice.Value.ToString("N0") đ</span>
+                                }
+                            </div>
+                            <div class="mt-auto d-flex gap-2">
+                                <a asp-controller="Home" asp-action="ProductDetail" asp-route-id="@p.Id" class="btn btn-outline-secondary btn-sm flex-grow-1">Chi tiết</a>
+                                <form asp-controller="Cart" asp-action="Add" method="post" class="d-inline">
+                                    <input type="hidden" name="productId" value="@p.Id" />
+                                    <input type="hidden" name="quantity" value="1" />
+                                    <input type="hidden" name="size" value="L" />
+                                    <button type="submit" class="btn btn-accent btn-sm" title="Thêm vào giỏ">
+                                        <i class="bi bi-cart-plus"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+}
+
+<!-- Bộ sưu tập Áo Sơ Mi -->
+@if (shirtProducts.Any())
+{
+    <section class="container mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <span class="text-uppercase text-primary fw-bold small">Bộ Sưu Tập Công Sở</span>
+                <h3 class="fw-bold mb-0">ÁO SƠ MI NAM NGỌC HIỂN</h3>
+            </div>
+            <a asp-controller="Home" asp-action="Products" asp-route-categoryId="1" class="btn btn-outline-primary btn-sm">Xem thêm áo sơ mi <i class="bi bi-arrow-right ms-1"></i></a>
+        </div>
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4">
+            @foreach (var p in shirtProducts)
+            {
+                <div class="col">
+                    <div class="product-card">
+                        <div class="product-thumb-wrapper">
+                            @if (p.DiscountPercent > 0)
+                            {
+                                <span class="badge-discount">-@p.DiscountPercent%</span>
+                            }
+                            <a asp-controller="Home" asp-action="ProductDetail" asp-route-id="@p.Id">
+                                <img src="@p.ImageUrl" alt="@p.Name" loading="lazy" />
+                            </a>
+                        </div>
+                        <div class="product-info">
+                            <span class="product-category">Áo Sơ Mi Cao Cấp</span>
+                            <h6 class="product-name">
+                                <a asp-controller="Home" asp-action="ProductDetail" asp-route-id="@p.Id" class="text-decoration-none text-dark">@p.Name</a>
+                            </h6>
+                            <div class="d-flex align-items-baseline mb-3">
+                                <span class="product-price">@p.Price.ToString("N0") đ</span>
+                                @if (p.OriginalPrice.HasValue && p.OriginalPrice > p.Price)
+                                {
+                                    <span class="product-old-price">@p.OriginalPrice.Value.ToString("N0") đ</span>
+                                }
+                            </div>
+                            <div class="mt-auto d-flex gap-2">
+                                <a asp-controller="Home" asp-action="ProductDetail" asp-route-id="@p.Id" class="btn btn-outline-secondary btn-sm flex-grow-1">Xem chi tiết</a>
+                                <form asp-controller="Cart" asp-action="Add" method="post" class="d-inline">
+                                    <input type="hidden" name="productId" value="@p.Id" />
+                                    <input type="hidden" name="quantity" value="1" />
+                                    <input type="hidden" name="size" value="L" />
+                                    <button type="submit" class="btn btn-accent btn-sm" title="Thêm vào giỏ">
+                                        <i class="bi bi-cart-plus"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+}
+
+<!-- Bộ sưu tập Áo Rét -->
+@if (winterProducts.Any())
+{
+    <section class="container mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <span class="text-uppercase text-danger fw-bold small">Bộ Sưu Tập Giữ Ấm Mùa Đông</span>
+                <h3 class="fw-bold mb-0">ÁO RÉT & ÁO KHOÁC ĐÔNG</h3>
+            </div>
+            <a asp-controller="Home" asp-action="Products" asp-route-categoryId="2" class="btn btn-outline-danger btn-sm">Xem thêm áo rét <i class="bi bi-arrow-right ms-1"></i></a>
+        </div>
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4">
+            @foreach (var p in winterProducts)
+            {
+                <div class="col">
+                    <div class="product-card">
+                        <div class="product-thumb-wrapper">
+                            @if (p.DiscountPercent > 0)
+                            {
+                                <span class="badge-discount">-@p.DiscountPercent%</span>
+                            }
+                            <a asp-controller="Home" asp-action="ProductDetail" asp-route-id="@p.Id">
+                                <img src="@p.ImageUrl" alt="@p.Name" loading="lazy" />
+                            </a>
+                        </div>
+                        <div class="product-info">
+                            <span class="product-category">Áo Rét Mùa Đông</span>
+                            <h6 class="product-name">
+                                <a asp-controller="Home" asp-action="ProductDetail" asp-route-id="@p.Id" class="text-decoration-none text-dark">@p.Name</a>
+                            </h6>
+                            <div class="d-flex align-items-baseline mb-3">
+                                <span class="product-price">@p.Price.ToString("N0") đ</span>
+                                @if (p.OriginalPrice.HasValue && p.OriginalPrice > p.Price)
+                                {
+                                    <span class="product-old-price">@p.OriginalPrice.Value.ToString("N0") đ</span>
+                                }
+                            </div>
+                            <div class="mt-auto d-flex gap-2">
+                                <a asp-controller="Home" asp-action="ProductDetail" asp-route-id="@p.Id" class="btn btn-outline-secondary btn-sm flex-grow-1">Xem chi tiết</a>
+                                <form asp-controller="Cart" asp-action="Add" method="post" class="d-inline">
+                                    <input type="hidden" name="productId" value="@p.Id" />
+                                    <input type="hidden" name="quantity" value="1" />
+                                    <input type="hidden" name="size" value="XL" />
+                                    <button type="submit" class="btn btn-accent btn-sm" title="Thêm vào giỏ">
+                                        <i class="bi bi-cart-plus"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+}
+
+<!-- Tin tức & Cẩm nang thời trang -->
+@if (latestArticles.Any())
+{
+    <section class="container mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <span class="text-uppercase text-muted fw-bold small">Cập Nhật Mới Nhất</span>
+                <h3 class="fw-bold mb-0">CẨM NANG & XU HƯỚNG THỜI TRANG</h3>
+            </div>
+            <a asp-controller="Home" asp-action="Articles" class="btn btn-outline-dark btn-sm">Xem tất cả bài viết</a>
+        </div>
+        <div class="row g-4">
+            @foreach (var art in latestArticles)
+            {
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden">
+                        <img src="@art.ThumbnailUrl" class="card-img-top" style="height: 200px; object-fit: cover;" alt="@art.Title">
+                        <div class="card-body d-flex flex-column">
+                            <span class="text-muted small mb-2"><i class="bi bi-calendar3 me-1"></i> @art.PublishedAt.ToString("dd/MM/yyyy") - @art.Author</span>
+                            <h5 class="card-title fw-bold">
+                                <a asp-controller="Home" asp-action="ArticleDetail" asp-route-id="@art.Id" class="text-decoration-none text-dark">@art.Title</a>
+                            </h5>
+                            <p class="card-text text-muted small flex-grow-1">@art.Summary</p>
+                            <a asp-controller="Home" asp-action="ArticleDetail" asp-route-id="@art.Id" class="text-danger fw-bold small text-decoration-none mt-2">Đọc tiếp <i class="bi bi-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+}
